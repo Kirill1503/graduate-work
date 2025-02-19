@@ -17,7 +17,7 @@ public interface AdService {
 
     AdDTO updateAd(long id, CreateOrUpdateAdDTO adDTO);
 
-    CreateOrUpdateAdDTO createAd(CreateOrUpdateAdDTO adDTO, MultipartFile image);
+    AdDTO createAd(CreateOrUpdateAdDTO adDTO, MultipartFile image);
 
     void updateAdImage(long id, MultipartFile image);
 }

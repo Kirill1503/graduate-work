@@ -58,7 +58,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public CreateOrUpdateAdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image) {
+    public AdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image) {
         return null;
     }
 

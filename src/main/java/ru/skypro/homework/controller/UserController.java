@@ -1,5 +1,7 @@
 package ru.skypro.homework.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.GetUserDTO;
@@ -16,7 +18,7 @@ public class UserController {
         this.userServiceImpl = userServiceImpl;
     }
 
-
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/set_password")
     public void updateUserPassword(@RequestParam("oldPassword") String oldPassword,
                                    @RequestParam("newPassword") String newPassword) {

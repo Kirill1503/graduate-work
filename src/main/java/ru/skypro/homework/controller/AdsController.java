@@ -38,8 +38,8 @@ public class AdsController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public CreateOrUpdateAdDTO createAd(@RequestPart("properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
-                                        @RequestPart("image") MultipartFile image) {
+    public AdDTO createAd(@RequestPart("properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
+                          @RequestPart("image") MultipartFile image) {
         return adServiceImpl.createAd(createOrUpdateAdDTO, image);
     }
 

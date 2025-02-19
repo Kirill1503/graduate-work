@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "comments")
@@ -26,13 +27,9 @@ public class Comment {
     @JoinColumn(name = "ad_id", nullable = false)
     private Ad ad;
 
+    @Column(nullable = false)
     private String text;
-    private Long createdAt;
 
-    public void setAdId(Long id) {
-    }
-
-    public void setAuthorId(Long id) {
-
-    }
+    @Column(nullable = false)
+    private Instant createdAt = Instant.now();
 }

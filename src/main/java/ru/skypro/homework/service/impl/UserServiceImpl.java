@@ -10,7 +10,6 @@ import ru.skypro.homework.exception.ThePasswordIsNotTrue;
 import ru.skypro.homework.exception.TheUserIsNotAuthenticated;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
-import ru.skypro.homework.service.FileStorageService;
 import ru.skypro.homework.service.UserService;
 import ru.skypro.homework.utils.MappingUserDTO;
 import ru.skypro.homework.utils.SecurityUtils;
@@ -30,7 +29,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final FileStorageService fileStorageService;
 
     @Override
     public void updateUserPassword(String oldPassword, String newPassword) {

@@ -3,8 +3,6 @@ package ru.skypro.homework.utils;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdDTOForGet;
-import ru.skypro.homework.dto.AdDTOForGetAll;
-import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.model.Ad;
 
 import java.util.List;
