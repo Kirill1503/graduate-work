@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -17,12 +18,19 @@ import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.utils.MappingAdDTO;
 import ru.skypro.homework.utils.SecurityUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AdServiceImpl implements AdService {
+
+    @Value("${ads.dir.path}")
+    private static String ADS_PATH;
 
     private final AdRepository adRepository;
     private final MappingAdDTO mappingAdDTO;
@@ -59,19 +67,58 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public AdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image) {
-        return null;
+        User user = getAuthenticatedUser();
+
+        Ad ad = new Ad();
+        ad.setTitle(createOrUpdateAdDTO.getTitle());
+        ad.setPrice(createOrUpdateAdDTO.getPrice());
+        ad.setDescription(createOrUpdateAdDTO.getDescription());
+        ad.setAuthor(user);
+
+        if (image != null && !image.isEmpty()) {
+            String imagePath = saveImage(image);
+            ad.setImage(imagePath);
+        }
+
+        Ad savedAd = adRepository.save(ad);
+        return mappingAdDTO.mapToAdDTO(savedAd);
     }
 
     @Override
     public AdDTO updateAd(long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        return null;
+        Ad ad = adRepository.findById(id)
+                .orElseThrow(() -> new AdNotFound("Ad not found"));
+
+        ad.setTitle(createOrUpdateAdDTO.getTitle());
+        ad.setPrice(createOrUpdateAdDTO.getPrice());
+        ad.setDescription(createOrUpdateAdDTO.getDescription());
+
+        Ad updatedAd = adRepository.save(ad);
+        return mappingAdDTO.mapToAdDTO(updatedAd);
     }
 
     @Override
     public void updateAdImage(long id, MultipartFile image) {
+        Ad ad = adRepository.findById(id)
+                .orElseThrow(() -> new AdNotFound("Ad not found"));
 
+        if (image != null && !image.isEmpty()) {
+            String imagePath = saveImage(image);
+            ad.setImage(imagePath);
+            adRepository.save(ad);
+        }
     }
 
+    private String saveImage(MultipartFile image) {
+        try {
+            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+            Path filePath = Paths.get(ADS_PATH, fileName);
+            Files.write(filePath, image.getBytes());
+            return filePath.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image", e);
+        }
+    }
 
     private User getAuthenticatedUser() {
         return Optional.ofNullable(SecurityUtils.getCurrentUsername())

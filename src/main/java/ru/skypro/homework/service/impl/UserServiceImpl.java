@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final String AVATAR_DIR = "uploads/avatars/";
+    @Value("${avatars.dir.path}")
+    private static String AVATAR_DIR;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
