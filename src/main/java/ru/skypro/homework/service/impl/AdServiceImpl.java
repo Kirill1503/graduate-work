@@ -30,11 +30,12 @@ import java.util.Optional;
 public class AdServiceImpl implements AdService {
 
     @Value("${ads.dir.path}")
-    private static String ADS_PATH;
+    private String ADS_PATH;
 
     private final AdRepository adRepository;
     private final MappingAdDTO mappingAdDTO;
     private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
 
     @Override
     public AdDTOForGet getAd(long id) {
@@ -121,7 +122,7 @@ public class AdServiceImpl implements AdService {
     }
 
     private User getAuthenticatedUser() {
-        return Optional.ofNullable(SecurityUtils.getCurrentUsername())
+        return Optional.ofNullable(securityUtils.getCurrentUsername())
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }

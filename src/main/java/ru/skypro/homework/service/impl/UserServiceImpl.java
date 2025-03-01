@@ -27,10 +27,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Value("${avatars.dir.path}")
-    private static String AVATAR_DIR;
+    static String AVATAR_DIR;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final SecurityUtils securityUtils;
 
     @Override
     public void updateUserPassword(String oldPassword, String newPassword) {
@@ -79,8 +80,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private User getAuthenticatedUser() {
-        return Optional.ofNullable(SecurityUtils.getCurrentUsername())
+    public User getAuthenticatedUser() {
+        return Optional.ofNullable(securityUtils.getCurrentUsername())
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }

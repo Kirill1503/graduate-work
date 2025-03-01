@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
@@ -22,18 +23,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final AdRepository adRepository;
     private final UserRepository userRepository;
-
-    public CommentServiceImpl(CommentRepository commentRepository,
-                              AdRepository adRepository, UserRepository userRepository) {
-        this.commentRepository = commentRepository;
-        this.adRepository = adRepository;
-        this.userRepository = userRepository;
-    }
+    private final SecurityUtils securityUtils;
 
     @Override
     public CommentResponseDTO getComments(Long adId) {
@@ -77,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private User getAuthenticatedUser() {
-        return Optional.ofNullable(SecurityUtils.getCurrentUsername())
+        return Optional.ofNullable(securityUtils.getCurrentUsername())
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }
