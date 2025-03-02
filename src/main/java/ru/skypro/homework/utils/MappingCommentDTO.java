@@ -7,7 +7,7 @@ import ru.skypro.homework.model.Comment;
 @Component
 public class MappingCommentDTO {
 
-    public static CommentDTO mapToDTO(Comment comment) {
+    public CommentDTO mapToDTO(Comment comment) {
         return new CommentDTO(
                 comment.getAuthor().getId(),
                 comment.getAuthor().getImage(),

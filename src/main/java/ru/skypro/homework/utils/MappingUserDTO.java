@@ -8,7 +8,7 @@ import ru.skypro.homework.model.User;
 @Component
 public class MappingUserDTO {
 
-    public static GetUserDTO mapToUserDTOForGetUserInformation(User user) {
+    public GetUserDTO mapToUserDTOForGetUserInformation(User user) {
         GetUserDTO getUserDTO = new GetUserDTO();
         getUserDTO.setId(user.getId());
         getUserDTO.setFirstName(user.getFirstName());
@@ -20,7 +20,7 @@ public class MappingUserDTO {
         return getUserDTO;
     }
 
-    public static UpdateUserDTO mapToUserDTOForUpdateUser(User user) {
+    public UpdateUserDTO mapToUserDTOForUpdateUser(User user) {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setFirstName(user.getFirstName());
         updateUserDTO.setLastName(user.getLastName());

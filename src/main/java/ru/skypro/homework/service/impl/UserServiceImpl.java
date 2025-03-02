@@ -2,6 +2,7 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final SecurityUtils securityUtils;
+    private final MappingUserDTO mappingUserDTO;
 
     @Override
     public void updateUserPassword(String oldPassword, String newPassword) {
@@ -46,17 +48,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public GetUserDTO getUserInformation() {
         User user = getAuthenticatedUser();
-        return MappingUserDTO.mapToUserDTOForGetUserInformation(user);
+        return mappingUserDTO.mapToUserDTOForGetUserInformation(user);
     }
 
     @Override
+    @PreAuthorize("#updateUserDTO.username == authentication.name")
     public UpdateUserDTO updateUserInformation(UpdateUserDTO updateUserDTO) {
         User user = getAuthenticatedUser();
         user.setFirstName(updateUserDTO.getFirstName());
         user.setLastName(updateUserDTO.getLastName());
         user.setPhone(updateUserDTO.getPhone());
         userRepository.save(user);
-        return MappingUserDTO.mapToUserDTOForUpdateUser(user);
+        return mappingUserDTO.mapToUserDTOForUpdateUser(user);
     }
 
     @Override
@@ -66,6 +69,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Uploaded file is empty");
         }
         try {
+            String avatarDir = "./avatars/";
             File uploadDir = new File(AVATAR_DIR);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();

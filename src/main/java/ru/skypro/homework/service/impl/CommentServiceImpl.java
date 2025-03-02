@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
@@ -30,12 +31,13 @@ public class CommentServiceImpl implements CommentService {
     private final AdRepository adRepository;
     private final UserRepository userRepository;
     private final SecurityUtils securityUtils;
+    private final MappingCommentDTO mappingCommentDTO;
 
     @Override
     public CommentResponseDTO getComments(Long adId) {
         List<CommentDTO> comments = commentRepository.findByAd_Id(adId)
                 .stream()
-                .map(MappingCommentDTO::mapToDTO)
+                .map(mappingCommentDTO::mapToDTO)
                 .collect(Collectors.toList());
 
         return new CommentResponseDTO(comments.size(), comments);
@@ -52,24 +54,35 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(dto.getText());
 
         Comment savedComment = commentRepository.save(comment);
-        return MappingCommentDTO.mapToDTO(savedComment);
+        return mappingCommentDTO.mapToDTO(savedComment);
     }
 
     @Override
     public void deleteComment(Long adId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFound("Comment not found"));
+        User currentUser = getAuthenticatedUser();
+
+        if (!comment.getAuthor().getUsername().equals(currentUser.getUsername())) {
+            throw new AccessDeniedException("You can only delete your own comments");
+        }
+
         commentRepository.delete(comment);
     }
 
     @Override
     public CommentDTO updateComment(Long adId, Long commentId, CreateOrUpdateCommentDTO dto) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFound("Комментарий не найден"));
+                .orElseThrow(() -> new CommentNotFound("Comment not found"));
+        User currentUser = getAuthenticatedUser();
+
+        if (!comment.getAuthor().getUsername().equals(currentUser.getUsername())) {
+            throw new AccessDeniedException("You can only update your own comments");
+        }
 
         comment.setText(dto.getText());
         Comment updatedComment = commentRepository.save(comment);
-        return MappingCommentDTO.mapToDTO(updatedComment);
+        return mappingCommentDTO.mapToDTO(updatedComment);
     }
 
     private User getAuthenticatedUser() {

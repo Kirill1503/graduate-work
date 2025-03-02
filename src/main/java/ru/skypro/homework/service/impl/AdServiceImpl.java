@@ -2,6 +2,7 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -63,6 +64,12 @@ public class AdServiceImpl implements AdService {
     public void deleteAd(long id) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
+        User currentUser = getAuthenticatedUser();
+
+        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())) {
+            throw new AccessDeniedException("You can only delete your own ads");
+        }
+
         adRepository.delete(ad);
     }
 
@@ -89,6 +96,11 @@ public class AdServiceImpl implements AdService {
     public AdDTO updateAd(long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
+        User currentUser = getAuthenticatedUser();
+
+        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())) {
+            throw new AccessDeniedException("You can only update your own ads");
+        }
 
         ad.setTitle(createOrUpdateAdDTO.getTitle());
         ad.setPrice(createOrUpdateAdDTO.getPrice());
