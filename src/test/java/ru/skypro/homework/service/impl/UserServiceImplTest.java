@@ -30,18 +30,14 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private PasswordEncoder encoder;
-
     @Mock
     private SecurityUtils securityUtils;
-
     @InjectMocks
     private UserServiceImpl userService;
 
     private User user;
-
     @TempDir
     private Path tempDir;
 
@@ -98,7 +94,7 @@ class UserServiceImplTest {
         GetUserDTO userDTO = userService.getUserInformation();
 
         assertThat(userDTO).isNotNull();
-        assertEquals("testUser", user.getUsername());
+        assertEquals(user.getId(), userDTO.getId());
     }
 
     @Test
@@ -148,14 +144,13 @@ class UserServiceImplTest {
         when(avatar.isEmpty()).thenReturn(false);
         when(avatar.getBytes()).thenReturn(fileContent);
 
-        UserServiceImpl.AVATAR_DIR = tempDir.toString() + "/";
+        // Используем сеттер для изменения пути аватаров
+        userService.setAvatarDir(tempDir.toString() + "/");
 
         userService.updateUserAvatar(avatar);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-
         verify(userRepository).save(userCaptor.capture());
-
         User savedUser = userCaptor.getValue();
 
         assertNotNull(savedUser.getImage());
@@ -165,7 +160,6 @@ class UserServiceImplTest {
     @Test
     void getAuthenticatedUser_NoAuthenticatedUser_ShouldThrowException() {
         when(securityUtils.getCurrentUsername()).thenReturn(null);
-
-        assertThrows(TheUserIsNotAuthenticated.class, userService::getAuthenticatedUser);
+        assertThrows(TheUserIsNotAuthenticated.class, () -> userService.getAuthenticatedUser());
     }
 }

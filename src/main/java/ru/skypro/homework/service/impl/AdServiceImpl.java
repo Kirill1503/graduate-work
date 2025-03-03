@@ -38,7 +38,7 @@ public class AdServiceImpl implements AdService {
     private final SecurityUtils securityUtils;
 
     @Override
-    public AdDTOForGet getAd(long id) {
+    public AdDTOForGet getAd(Long id) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
         return mappingAdDTO.mapToAdDTOForGet(ad);
@@ -48,21 +48,27 @@ public class AdServiceImpl implements AdService {
     public AdDTOForGetAll getAllAdsUser() {
         User user = getAuthenticatedUser();
         List<Ad> ads = adRepository.findByAuthor_Id(user.getId());
-        List<AdDTO> adDTOList = mappingAdDTO.toDTOList(ads);
+        List<AdDTOForGet> adDTOList = mappingAdDTO.toDTOList(ads);
         return new AdDTOForGetAll(adDTOList.size(), adDTOList);
     }
 
     @Override
     public AdDTOForGetAll getAllAds() {
         List<Ad> ads = adRepository.findAll();
-        List<AdDTO> adDTOList = mappingAdDTO.toDTOList(ads);
+        List<AdDTOForGet> adDTOList = mappingAdDTO.toDTOList(ads);
         return new AdDTOForGetAll(ads.size(), adDTOList);
     }
 
     @Override
-    public void deleteAd(long id) {
+    public void deleteAd(Long id) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
+        User currentUser = getAuthenticatedUser();
+        // Если пользователь не ADMIN и не владелец объявления, выбрасываем исключение
+        if (!currentUser.getRole().name().equals("ADMIN") &&
+                !currentUser.getUsername().equals(ad.getAuthor().getUsername())) {
+            throw new SecurityException("You are not authorized to delete this ad");
+        }
         adRepository.delete(ad);
     }
 
@@ -86,23 +92,20 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public AdDTO updateAd(long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
+    public AdDTO updateAd(Long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
-
         ad.setTitle(createOrUpdateAdDTO.getTitle());
         ad.setPrice(createOrUpdateAdDTO.getPrice());
         ad.setDescription(createOrUpdateAdDTO.getDescription());
-
         Ad updatedAd = adRepository.save(ad);
         return mappingAdDTO.mapToAdDTO(updatedAd);
     }
 
     @Override
-    public void updateAdImage(long id, MultipartFile image) {
+    public void updateAdImage(Long id, MultipartFile image) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
-
         if (image != null && !image.isEmpty()) {
             String imagePath = saveImage(image);
             ad.setImage(imagePath);
@@ -122,7 +125,8 @@ public class AdServiceImpl implements AdService {
     }
 
     private User getAuthenticatedUser() {
-        return Optional.ofNullable(securityUtils.getCurrentUsername())
+        String username = securityUtils.getCurrentUsername();
+        return Optional.ofNullable(username)
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }

@@ -19,10 +19,8 @@ class AuthServiceImplTest {
 
     @Mock
     private UserDetailsManager manager;
-
     @Mock
     private PasswordEncoder encoder;
-
     @InjectMocks
     private AuthServiceImpl authServiceImpl;
 

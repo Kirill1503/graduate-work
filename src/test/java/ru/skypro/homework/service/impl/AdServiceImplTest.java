@@ -9,9 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.AdDTO;
+import ru.skypro.homework.dto.AdDTOForGet;
 import ru.skypro.homework.dto.AdDTOForGetAll;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.exception.AdNotFound;
 import ru.skypro.homework.exception.TheUserIsNotAuthenticated;
 import ru.skypro.homework.model.Ad;
@@ -49,7 +50,6 @@ class AdServiceImplTest {
     private Path tempDir;
 
     private User user;
-
     private Ad ad;
 
     @BeforeEach
@@ -58,6 +58,12 @@ class AdServiceImplTest {
         user.setId(1L);
         user.setUsername("username");
         user.setPassword("password");
+        user.setRole(Role.USER);
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john.doe@example.com");
+        user.setPhone("1234567890");
+
         ad = new Ad();
         ad.setId(1L);
         ad.setDescription("description");
@@ -88,7 +94,7 @@ class AdServiceImplTest {
     @Test
     void getAdPositiveTest() {
         when(adRepository.findById(1L)).thenReturn(Optional.of(ad));
-        var adDTO = mappingAdDTO.mapToAdDTOForGet(ad);
+        AdDTOForGet adDTO = mappingAdDTO.mapToAdDTOForGet(ad);
         when(mappingAdDTO.mapToAdDTOForGet(ad)).thenReturn(adDTO);
 
         assertThat(adService.getAd(ad.getId())).isEqualTo(adDTO);
@@ -108,10 +114,16 @@ class AdServiceImplTest {
         when(userRepository.findUserByUsername("username")).thenReturn(user);
         List<Ad> testList = List.of(ad);
         when(adRepository.findByAuthor_Id(user.getId())).thenReturn(testList);
-        List<AdDTO> adsDTOTest = mappingAdDTO.toDTOList(testList);
+        // Создаём dummy-объект типа AdDTOForGet
+        AdDTOForGet dummyDto = new AdDTOForGet(
+                ad.getId(), user.getFirstName(), user.getLastName(),
+                ad.getDescription(), user.getEmail(), ad.getImage(),
+                user.getPhone(), ad.getPrice(), ad.getTitle()
+        );
+        List<AdDTOForGet> adsDTOTest = List.of(dummyDto);
         when(mappingAdDTO.toDTOList(testList)).thenReturn(adsDTOTest);
-        AdDTOForGetAll adDTOForGetAllTest = new AdDTOForGetAll(adsDTOTest.size(), adsDTOTest);
-        assertThat(adService.getAllAdsUser()).isEqualTo(adDTOForGetAllTest);
+        AdDTOForGetAll expected = new AdDTOForGetAll(adsDTOTest.size(), adsDTOTest);
+        assertThat(adService.getAllAdsUser()).isEqualTo(expected);
     }
 
     @Test
@@ -125,7 +137,12 @@ class AdServiceImplTest {
     @Test
     void getAllAds() {
         List<Ad> testList = List.of(ad);
-        List<AdDTO> adsDTOTest = List.of(new AdDTO());
+        AdDTOForGet dummyDto = new AdDTOForGet(
+                ad.getId(), user.getFirstName(), user.getLastName(),
+                ad.getDescription(), user.getEmail(), ad.getImage(),
+                user.getPhone(), ad.getPrice(), ad.getTitle()
+        );
+        List<AdDTOForGet> adsDTOTest = List.of(dummyDto);
         when(adRepository.findAll()).thenReturn(testList);
         when(mappingAdDTO.toDTOList(testList)).thenReturn(adsDTOTest);
         AdDTOForGetAll expected = new AdDTOForGetAll(adsDTOTest.size(), adsDTOTest);
@@ -136,6 +153,9 @@ class AdServiceImplTest {
     @Test
     void deleteAd() {
         when(adRepository.findById(ad.getId())).thenReturn(Optional.of(ad));
+        // Текущий пользователь совпадает с автором объявления
+        when(securityUtils.getCurrentUsername()).thenReturn(user.getUsername());
+        when(userRepository.findUserByUsername(user.getUsername())).thenReturn(user);
 
         adService.deleteAd(ad.getId());
 
@@ -161,12 +181,12 @@ class AdServiceImplTest {
         savedAd.setImage("some-image-path");
 
         when(adRepository.save(any(Ad.class))).thenReturn(savedAd);
-        AdDTO adDTO = new AdDTO();
-        when(mappingAdDTO.mapToAdDTO(savedAd)).thenReturn(adDTO);
+        ru.skypro.homework.dto.AdDTO returnedDto = new ru.skypro.homework.dto.AdDTO(user, "some-image-path", 1L, 1000, "title");
+        when(mappingAdDTO.mapToAdDTO(savedAd)).thenReturn(returnedDto);
 
-        AdDTO result = adService.createAd(createOrUpdateAdDTO, image);
-
-        assertThat(result).isEqualTo(adDTO);
+        ru.skypro.homework.dto.AdDTO result = adService.createAd(createOrUpdateAdDTO, image);
+        verify(mappingAdDTO).mapToAdDTO(savedAd);
+        assertThat(result).isEqualTo(returnedDto);
     }
 
     @Test
@@ -180,10 +200,10 @@ class AdServiceImplTest {
         updatedAd.setPrice(updateDTO.getPrice());
         updatedAd.setAuthor(user);
         when(adRepository.save(any(Ad.class))).thenReturn(updatedAd);
-        AdDTO adDTO = new AdDTO();
+        ru.skypro.homework.dto.AdDTO adDTO = new ru.skypro.homework.dto.AdDTO();
         when(mappingAdDTO.mapToAdDTO(updatedAd)).thenReturn(adDTO);
 
-        AdDTO result = adService.updateAd(ad.getId(), updateDTO);
+        ru.skypro.homework.dto.AdDTO result = adService.updateAd(ad.getId(), updateDTO);
 
         assertThat(result).isEqualTo(adDTO);
     }

@@ -37,7 +37,6 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .map(MappingCommentDTO::mapToDTO)
                 .collect(Collectors.toList());
-
         return new CommentResponseDTO(comments.size(), comments);
     }
 
@@ -45,12 +44,10 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO addComment(Long adId, CreateOrUpdateCommentDTO dto) {
         Ad ad = adRepository.findById(adId).orElseThrow(() -> new AdNotFound("Объявление не найдено"));
         User user = getAuthenticatedUser();
-
         Comment comment = new Comment();
         comment.setAd(ad);
         comment.setAuthor(user);
         comment.setText(dto.getText());
-
         Comment savedComment = commentRepository.save(comment);
         return MappingCommentDTO.mapToDTO(savedComment);
     }
@@ -66,14 +63,14 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO updateComment(Long adId, Long commentId, CreateOrUpdateCommentDTO dto) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFound("Комментарий не найден"));
-
         comment.setText(dto.getText());
         Comment updatedComment = commentRepository.save(comment);
         return MappingCommentDTO.mapToDTO(updatedComment);
     }
 
     private User getAuthenticatedUser() {
-        return Optional.ofNullable(securityUtils.getCurrentUsername())
+        String username = securityUtils.getCurrentUsername();
+        return Optional.ofNullable(username)
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }

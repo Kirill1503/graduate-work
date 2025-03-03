@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -15,7 +16,6 @@ import ru.skypro.homework.service.AdService;
 public class AdsController {
 
     private final AdService adService;
-
 
     @GetMapping("{id}")
     public AdDTOForGet getAd(@PathVariable Long id) {
@@ -33,7 +33,8 @@ public class AdsController {
     }
 
     @DeleteMapping("{id}")
-    public void deleteAd(@PathVariable long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAd(@PathVariable Long id) {
         adService.deleteAd(id);
     }
 
@@ -43,15 +44,14 @@ public class AdsController {
         return adService.createAd(createOrUpdateAdDTO, image);
     }
 
-
     @PatchMapping("{id}")
-    public AdDTO updateAd(@PathVariable long id,
+    public AdDTO updateAd(@PathVariable Long id,
                           @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         return adService.updateAd(id, createOrUpdateAdDTO);
     }
 
     @PatchMapping(value = "{id}/image", consumes = "multipart/form-data")
-    public void updateAdImage(@PathVariable long id,
+    public void updateAdImage(@PathVariable Long id,
                               @RequestPart("image") MultipartFile image) {
         adService.updateAdImage(id, image);
     }

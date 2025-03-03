@@ -35,9 +35,9 @@ public class MappingAdDTO {
         );
     }
 
-    public List<AdDTO> toDTOList(List<Ad> ads) {
+    public List<AdDTOForGet> toDTOList(List<Ad> ads) {
         return ads.stream()
-                .map(this::mapToAdDTO)
+                .map(this::mapToAdDTOForGet)
                 .collect(Collectors.toList());
     }
 }

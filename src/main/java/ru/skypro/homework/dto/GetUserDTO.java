@@ -1,14 +1,15 @@
 package ru.skypro.homework.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.skypro.homework.dto.Role;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class GetUserDTO {
-    private long id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;

@@ -7,17 +7,17 @@ import ru.skypro.homework.dto.AdDTOForGetAll;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 
 public interface AdService {
-    AdDTOForGet getAd(long id);
+    AdDTOForGet getAd(Long id);
 
     AdDTOForGetAll getAllAdsUser();
 
     AdDTOForGetAll getAllAds();
 
-    void deleteAd(long id);
+    void deleteAd(Long id);
 
-    AdDTO updateAd(long id, CreateOrUpdateAdDTO adDTO);
+    AdDTO updateAd(Long id, CreateOrUpdateAdDTO adDTO);
 
     AdDTO createAd(CreateOrUpdateAdDTO adDTO, MultipartFile image);
 
-    void updateAdImage(long id, MultipartFile image);
+    void updateAdImage(Long id, MultipartFile image);
 }

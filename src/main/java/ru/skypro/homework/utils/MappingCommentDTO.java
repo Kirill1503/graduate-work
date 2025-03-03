@@ -9,7 +9,7 @@ public class MappingCommentDTO {
 
     public static CommentDTO mapToDTO(Comment comment) {
         return new CommentDTO(
-                comment.getAuthor().getId(),
+                comment.getId(),
                 comment.getAuthor().getImage(),
                 comment.getAuthor().getFirstName(),
                 comment.getCreatedAt(),

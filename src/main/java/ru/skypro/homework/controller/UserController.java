@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,15 +10,12 @@ import ru.skypro.homework.service.UserService;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/set_password")
     public void updateUserPassword(@RequestParam("oldPassword") String oldPassword,
                                    @RequestParam("newPassword") String newPassword) {
@@ -35,6 +33,7 @@ public class UserController {
     }
 
     @PatchMapping("/me/image")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUserAvatar(@RequestParam("file") MultipartFile file) {
         userService.updateUserAvatar(file);
     }

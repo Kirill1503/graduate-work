@@ -4,7 +4,6 @@ import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
 
-
 public interface CommentService {
 
     CommentResponseDTO getComments(Long adId);

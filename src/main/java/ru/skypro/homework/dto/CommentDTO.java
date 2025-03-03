@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class CommentDTO {
-    private long pk;
+    private Long pk;
     private String authorImage;
     private String authorFirstName;
     private Instant createdAt;
-    private long commentId;
+    private Long commentId;
     private String text;
 }

@@ -27,7 +27,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Value("${avatars.dir.path}")
-    static String AVATAR_DIR;
+    private String AVATAR_DIR;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
                 uploadDir.mkdirs();
             }
             String fileName = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + ".png";
-            Path filePath = Paths.get(AVATAR_DIR + fileName);
+            Path filePath = Paths.get(AVATAR_DIR, fileName);
             Files.write(filePath, avatar.getBytes());
             user.setImage(fileName);
             userRepository.save(user);
@@ -80,9 +80,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User getAuthenticatedUser() {
-        return Optional.ofNullable(securityUtils.getCurrentUsername())
+    User getAuthenticatedUser() {
+        String username = securityUtils.getCurrentUsername();
+        return Optional.ofNullable(username)
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
+    }
+
+    // Для тестирования можно задать директорию для аватаров
+    public void setAvatarDir(String avatarDir) {
+        this.AVATAR_DIR = avatarDir;
     }
 }

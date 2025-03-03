@@ -11,5 +11,5 @@ import java.util.List;
 @NoArgsConstructor
 public class AdDTOForGetAll {
     private int count;
-    private List<AdDTO> results;
+    private List<AdDTOForGet> results;
 }

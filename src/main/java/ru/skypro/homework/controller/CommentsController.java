@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
@@ -26,6 +27,7 @@ public class CommentsController {
     }
 
     @DeleteMapping("{adId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Long adId,
                               @PathVariable Long commentId) {
         commentService.deleteComment(adId, commentId);
