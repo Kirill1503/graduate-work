@@ -1,14 +1,16 @@
 package ru.skypro.homework.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class UpdateUserDTO {
     private String firstName;
     private String lastName;
     private String phone;
+    private String username;
+
 }

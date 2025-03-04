@@ -63,13 +63,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("#avatar.originalFilename != null && #authentication.name == securityUtils.getCurrentUsername()")
     public void updateUserAvatar(MultipartFile avatar) {
         User user = getAuthenticatedUser();
         if (avatar.isEmpty()) {
             throw new IllegalArgumentException("Uploaded file is empty");
         }
         try {
-            String avatarDir = "./avatars/";
             File uploadDir = new File(AVATAR_DIR);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();

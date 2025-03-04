@@ -3,6 +3,7 @@ package ru.skypro.homework.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -61,6 +62,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void deleteAd(long id) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
@@ -93,6 +95,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public AdDTO updateAd(long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
@@ -111,6 +114,7 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void updateAdImage(long id, MultipartFile image) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));

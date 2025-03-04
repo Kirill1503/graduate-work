@@ -144,7 +144,7 @@ class AdServiceImplTest {
 
     @Test
     void createAd() throws IOException {
-        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO("title", 1000, "description");
+        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO("title", 1000, "description", "authorname");
         MultipartFile image = mock(MultipartFile.class);
         when(securityUtils.getCurrentUsername()).thenReturn("username");
         when(userRepository.findUserByUsername("username")).thenReturn(user);
@@ -171,7 +171,7 @@ class AdServiceImplTest {
 
     @Test
     void updateAd() {
-        CreateOrUpdateAdDTO updateDTO = new CreateOrUpdateAdDTO("newTitle", 2000, "newDescription");
+        CreateOrUpdateAdDTO updateDTO = new CreateOrUpdateAdDTO("newTitle", 2000, "newDescription", "authorname");
         when(adRepository.findById(ad.getId())).thenReturn(Optional.of(ad));
         Ad updatedAd = new Ad();
         updatedAd.setId(ad.getId());

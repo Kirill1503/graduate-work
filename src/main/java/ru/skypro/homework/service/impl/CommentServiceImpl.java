@@ -2,6 +2,7 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
@@ -58,6 +59,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
     public void deleteComment(Long adId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFound("Comment not found"));
@@ -71,6 +73,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
     public CommentDTO updateComment(Long adId, Long commentId, CreateOrUpdateCommentDTO dto) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFound("Comment not found"));
