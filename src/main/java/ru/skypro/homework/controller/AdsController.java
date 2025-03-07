@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -33,6 +34,7 @@ public class AdsController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void deleteAd(@PathVariable long id) {
         adService.deleteAd(id);
     }
@@ -45,12 +47,14 @@ public class AdsController {
 
 
     @PatchMapping("{id}")
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public AdDTO updateAd(@PathVariable long id,
                           @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         return adService.updateAd(id, createOrUpdateAdDTO);
     }
 
     @PatchMapping(value = "{id}/image", consumes = "multipart/form-data")
+    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void updateAdImage(@PathVariable long id,
                               @RequestPart("image") MultipartFile image) {
         adService.updateAdImage(id, image);

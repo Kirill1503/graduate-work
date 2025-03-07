@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("#updateUserDTO.username == authentication.name")
     public UpdateUserDTO updateUserInformation(UpdateUserDTO updateUserDTO) {
         User user = getAuthenticatedUser();
         user.setFirstName(updateUserDTO.getFirstName());
@@ -63,7 +62,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("#avatar.originalFilename != null && #authentication.name == securityUtils.getCurrentUsername()")
     public void updateUserAvatar(MultipartFile avatar) {
         User user = getAuthenticatedUser();
         if (avatar.isEmpty()) {

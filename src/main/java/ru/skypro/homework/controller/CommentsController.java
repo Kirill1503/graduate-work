@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentResponseDTO;
@@ -26,12 +27,14 @@ public class CommentsController {
     }
 
     @DeleteMapping("{adId}/comments/{commentId}")
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
     public void deleteComment(@PathVariable Long adId,
                               @PathVariable Long commentId) {
         commentService.deleteComment(adId, commentId);
     }
 
     @PatchMapping("{adId}/comments/{commentId}")
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
     public CommentDTO updateComment(@PathVariable Long adId,
                                     @PathVariable Long commentId,
                                     @RequestBody CreateOrUpdateCommentDTO dto) {

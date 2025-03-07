@@ -135,6 +135,8 @@ class AdServiceImplTest {
 
     @Test
     void deleteAd() {
+        when(securityUtils.getCurrentUsername()).thenReturn(user.getUsername());
+        when(userRepository.findUserByUsername(user.getUsername())).thenReturn(user);
         when(adRepository.findById(ad.getId())).thenReturn(Optional.of(ad));
 
         adService.deleteAd(ad.getId());
@@ -144,7 +146,8 @@ class AdServiceImplTest {
 
     @Test
     void createAd() throws IOException {
-        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO("title", 1000, "description", "authorname");
+        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO("title", 1000,
+                "description", "authorname");
         MultipartFile image = mock(MultipartFile.class);
         when(securityUtils.getCurrentUsername()).thenReturn("username");
         when(userRepository.findUserByUsername("username")).thenReturn(user);
@@ -171,21 +174,29 @@ class AdServiceImplTest {
 
     @Test
     void updateAd() {
-        CreateOrUpdateAdDTO updateDTO = new CreateOrUpdateAdDTO("newTitle", 2000, "newDescription", "authorname");
+        CreateOrUpdateAdDTO updateDTO = new CreateOrUpdateAdDTO("newTitle", 2000,
+                "newDescription", "authorname");
+
+        when(securityUtils.getCurrentUsername()).thenReturn(user.getUsername());
+        when(userRepository.findUserByUsername(user.getUsername())).thenReturn(user);
         when(adRepository.findById(ad.getId())).thenReturn(Optional.of(ad));
-        Ad updatedAd = new Ad();
-        updatedAd.setId(ad.getId());
-        updatedAd.setTitle(updateDTO.getTitle());
-        updatedAd.setDescription(updateDTO.getDescription());
-        updatedAd.setPrice(updateDTO.getPrice());
-        updatedAd.setAuthor(user);
-        when(adRepository.save(any(Ad.class))).thenReturn(updatedAd);
+
+        doAnswer(invocation -> {
+            Ad updatedAd = invocation.getArgument(0);
+            ad.setTitle(updatedAd.getTitle());
+            ad.setDescription(updatedAd.getDescription());
+            ad.setPrice(updatedAd.getPrice());
+            return updatedAd;
+        }).when(adRepository).save(any(Ad.class));
+
         AdDTO adDTO = new AdDTO();
-        when(mappingAdDTO.mapToAdDTO(updatedAd)).thenReturn(adDTO);
+        when(mappingAdDTO.mapToAdDTO(ad)).thenReturn(adDTO);
 
         AdDTO result = adService.updateAd(ad.getId(), updateDTO);
 
         assertThat(result).isEqualTo(adDTO);
+        assertThat(ad.getTitle()).isEqualTo("newTitle");
+        assertThat(ad.getPrice()).isEqualTo(2000);
     }
 
     @Test

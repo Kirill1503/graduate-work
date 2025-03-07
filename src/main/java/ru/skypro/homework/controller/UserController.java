@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.GetUserDTO;
@@ -30,11 +31,14 @@ public class UserController {
     }
 
     @PatchMapping("/me")
+    @PreAuthorize("#updateUserDTO.username == authentication.name")
     public UpdateUserDTO updateUserInformation(@RequestBody UpdateUserDTO updateUserDTO) {
         return userService.updateUserInformation(updateUserDTO);
     }
 
     @PatchMapping("/me/image")
+    @PreAuthorize("#userServiceImpl.getAuthenticatedUser().image.toString().originalFilename " +
+            "!= null && #authentication.name == securityUtils.getCurrentUsername()")
     public void updateUserAvatar(@RequestParam("file") MultipartFile file) {
         userService.updateUserAvatar(file);
     }

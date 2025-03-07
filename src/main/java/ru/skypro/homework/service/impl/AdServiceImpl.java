@@ -62,7 +62,6 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void deleteAd(long id) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
@@ -95,7 +94,6 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public AdDTO updateAd(long id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
@@ -114,7 +112,6 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    @PreAuthorize("#adRepository.findById(#id).get().author.username == authentication.name")
     public void updateAdImage(long id, MultipartFile image) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));

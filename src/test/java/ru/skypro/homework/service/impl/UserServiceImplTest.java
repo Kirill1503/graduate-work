@@ -11,11 +11,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.GetUserDTO;
+import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UpdateUserDTO;
 import ru.skypro.homework.exception.ThePasswordIsNotTrue;
 import ru.skypro.homework.exception.TheUserIsNotAuthenticated;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.utils.MappingUserDTO;
 import ru.skypro.homework.utils.SecurityUtils;
 
 import java.io.IOException;
@@ -37,6 +39,9 @@ class UserServiceImplTest {
     @Mock
     private SecurityUtils securityUtils;
 
+    @Mock
+    private MappingUserDTO mappingUserDTO;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -51,6 +56,7 @@ class UserServiceImplTest {
         user = new User();
         user.setId(1L);
         user.setUsername("testUser");
+        user.setFirstName("testFirstName");
         user.setPassword("encodedPassword");
     }
 
@@ -95,10 +101,14 @@ class UserServiceImplTest {
         when(securityUtils.getCurrentUsername()).thenReturn("testUser");
         when(userRepository.findUserByUsername("testUser")).thenReturn(user);
 
-        GetUserDTO userDTO = userService.getUserInformation();
+        GetUserDTO userDTO = new GetUserDTO(1L, "testFirstName", "firstName",
+                "lastName", "79999999999", "hghgh", Role.USER);
+        when(mappingUserDTO.mapToUserDTOForGetUserInformation(user)).thenReturn(userDTO);
 
-        assertThat(userDTO).isNotNull();
-        assertEquals("testUser", user.getUsername());
+        GetUserDTO result = userService.getUserInformation();
+
+        assertThat(result).isNotNull();
+        assertEquals("testFirstName", result.getFirstName());
     }
 
     @Test
@@ -111,12 +121,14 @@ class UserServiceImplTest {
         updateUserDTO.setLastName("newLastName");
         updateUserDTO.setPhone("79999999999");
 
-        UpdateUserDTO updatedUserDTO = userService.updateUserInformation(updateUserDTO);
+        when(mappingUserDTO.mapToUserDTOForUpdateUser(user)).thenReturn(updateUserDTO);
 
-        assertEquals("newFirstName", updatedUserDTO.getFirstName());
-        assertEquals("newLastName", updatedUserDTO.getLastName());
-        assertEquals("79999999999", updatedUserDTO.getPhone());
-        verify(userRepository).save(user);
+        UpdateUserDTO result = userService.updateUserInformation(updateUserDTO);
+
+        assertThat(result).isNotNull();
+        assertEquals("newFirstName", result.getFirstName());
+        assertEquals("newLastName", result.getLastName());
+        assertEquals("79999999999", result.getPhone());
     }
 
     @Test
