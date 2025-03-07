@@ -1,9 +1,7 @@
 databaseChangeLog:
-  include1:
-    file: liquibase/scripts/users.sql
-
-  include2:
-    file: liquibase/scripts/ads.sql
-
-  include3:
-    file: liquibase/scripts/comments.sql
+  - include:
+      file: liquibase/scripts/users.sql
+  - include:
+      file: liquibase/scripts/ads.sql
+  - include:
+      file: liquibase/scripts/comments.sql
