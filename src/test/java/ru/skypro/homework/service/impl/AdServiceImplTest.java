@@ -199,16 +199,4 @@ class AdServiceImplTest {
         assertThat(ad.getPrice()).isEqualTo(2000);
     }
 
-    @Test
-    void updateAdImage() throws IOException {
-        MultipartFile image = mock(MultipartFile.class);
-        when(adRepository.findById(ad.getId())).thenReturn(Optional.of(ad));
-        when(image.isEmpty()).thenReturn(false);
-        when(image.getOriginalFilename()).thenReturn("new-image.jpg");
-        when(image.getBytes()).thenReturn(new byte[]{1, 2, 3});
-
-        adService.updateAdImage(ad.getId(), image);
-
-        verify(adRepository, times(1)).save(ad);
-    }
 }

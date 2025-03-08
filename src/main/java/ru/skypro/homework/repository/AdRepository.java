@@ -6,7 +6,7 @@ import ru.skypro.homework.model.Ad;
 import java.util.List;
 import java.util.Optional;
 
-public interface AdRepository extends JpaRepository<Ad, Integer> {
+public interface AdRepository extends JpaRepository<Ad, Long> {
     Optional<Ad> findById(Long id);
 
     List<Ad> findByAuthor_Id(Long authorId);

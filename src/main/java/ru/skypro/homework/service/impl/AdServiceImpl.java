@@ -1,9 +1,7 @@
 package ru.skypro.homework.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -28,16 +26,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AdServiceImpl implements AdService {
 
-    @Value("${ads.dir.path}")
-    private String ADS_PATH;
-
+    private final String ADS_PATH;
     private final AdRepository adRepository;
     private final MappingAdDTO mappingAdDTO;
     private final UserRepository userRepository;
     private final SecurityUtils securityUtils;
+
+    public AdServiceImpl(@Value("${ads.dir.path}") String adsPath,
+                         AdRepository adRepository,
+                         MappingAdDTO mappingAdDTO,
+                         UserRepository userRepository,
+                         SecurityUtils securityUtils) {
+        this.ADS_PATH = adsPath;
+        this.adRepository = adRepository;
+        this.mappingAdDTO = mappingAdDTO;
+        this.userRepository = userRepository;
+        this.securityUtils = securityUtils;
+    }
 
     @Override
     public AdDTOForGet getAd(long id) {
@@ -66,29 +73,26 @@ public class AdServiceImpl implements AdService {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
         User currentUser = getAuthenticatedUser();
-
-        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())) {
+        // Разрешаем удаление либо владельцу объявления, либо администратору
+        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())
+                && !currentUser.getRole().name().equals("ADMIN")) {
             throw new AccessDeniedException("You can only delete your own ads");
         }
-
         adRepository.delete(ad);
     }
 
     @Override
     public AdDTO createAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, MultipartFile image) {
         User user = getAuthenticatedUser();
-
         Ad ad = new Ad();
         ad.setTitle(createOrUpdateAdDTO.getTitle());
         ad.setPrice(createOrUpdateAdDTO.getPrice());
         ad.setDescription(createOrUpdateAdDTO.getDescription());
         ad.setAuthor(user);
-
         if (image != null && !image.isEmpty()) {
-            String imagePath = saveImage(image);
-            ad.setImage(imagePath);
+            String imageName = saveImage(image);
+            ad.setImage(imageName);
         }
-
         Ad savedAd = adRepository.save(ad);
         return mappingAdDTO.mapToAdDTO(savedAd);
     }
@@ -98,15 +102,13 @@ public class AdServiceImpl implements AdService {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
         User currentUser = getAuthenticatedUser();
-
-        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())) {
+        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())
+                && !currentUser.getRole().name().equals("ADMIN")) {
             throw new AccessDeniedException("You can only update your own ads");
         }
-
         ad.setTitle(createOrUpdateAdDTO.getTitle());
         ad.setPrice(createOrUpdateAdDTO.getPrice());
         ad.setDescription(createOrUpdateAdDTO.getDescription());
-
         Ad updatedAd = adRepository.save(ad);
         return mappingAdDTO.mapToAdDTO(updatedAd);
     }
@@ -115,10 +117,14 @@ public class AdServiceImpl implements AdService {
     public void updateAdImage(long id, MultipartFile image) {
         Ad ad = adRepository.findById(id)
                 .orElseThrow(() -> new AdNotFound("Ad not found"));
-
+        User currentUser = getAuthenticatedUser();
+        if (!ad.getAuthor().getUsername().equals(currentUser.getUsername())
+                && !currentUser.getRole().name().equals("ADMIN")) {
+            throw new AccessDeniedException("You can only update your own ad images");
+        }
         if (image != null && !image.isEmpty()) {
-            String imagePath = saveImage(image);
-            ad.setImage(imagePath);
+            String imageName = saveImage(image);
+            ad.setImage(imageName);
             adRepository.save(ad);
         }
     }
@@ -128,14 +134,15 @@ public class AdServiceImpl implements AdService {
             String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
             Path filePath = Paths.get(ADS_PATH, fileName);
             Files.write(filePath, image.getBytes());
-            return filePath.toString();
+            return fileName; // Возвращаем имя файла для формирования URL
         } catch (IOException e) {
             throw new RuntimeException("Failed to save image", e);
         }
     }
 
     private User getAuthenticatedUser() {
-        return Optional.ofNullable(securityUtils.getCurrentUsername())
+        String username = securityUtils.getCurrentUsername();
+        return Optional.ofNullable(username)
                 .map(userRepository::findUserByUsername)
                 .orElseThrow(() -> new TheUserIsNotAuthenticated("The user is not authenticated"));
     }

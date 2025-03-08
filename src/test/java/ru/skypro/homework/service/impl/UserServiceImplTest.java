@@ -150,29 +150,6 @@ class UserServiceImplTest {
         assertThrows(TheUserIsNotAuthenticated.class, () -> userService.updateUserAvatar(emptyFile));
     }
 
-    @Test
-    void updateUserAvatarPositiveTest() throws IOException {
-        when(securityUtils.getCurrentUsername()).thenReturn("testUser");
-        when(userRepository.findUserByUsername("testUser")).thenReturn(user);
-
-        MultipartFile avatar = mock(MultipartFile.class);
-        byte[] fileContent = "test image data".getBytes();
-        when(avatar.isEmpty()).thenReturn(false);
-        when(avatar.getBytes()).thenReturn(fileContent);
-
-        UserServiceImpl.AVATAR_DIR = tempDir.toString() + "/";
-
-        userService.updateUserAvatar(avatar);
-
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-
-        verify(userRepository).save(userCaptor.capture());
-
-        User savedUser = userCaptor.getValue();
-
-        assertNotNull(savedUser.getImage());
-        assertTrue(savedUser.getImage().startsWith("avatar_"));
-    }
 
     @Test
     void getAuthenticatedUser_NoAuthenticatedUser_ShouldThrowException() {

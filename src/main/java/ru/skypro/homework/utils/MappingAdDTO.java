@@ -27,7 +27,7 @@ public class MappingAdDTO {
 
     public AdDTO mapToAdDTO(Ad ad) {
         return new AdDTO(
-                ad.getAuthor(),
+                ad.getAuthor().getId(),
                 ad.getImage(),
                 ad.getId(),
                 ad.getPrice(),

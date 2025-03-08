@@ -28,7 +28,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Value("${avatars.dir.path}")
-    static String AVATAR_DIR;
+    private String AVATAR_DIR;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                 uploadDir.mkdirs();
             }
             String fileName = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + ".png";
-            Path filePath = Paths.get(AVATAR_DIR + fileName);
+            Path filePath = Paths.get(AVATAR_DIR, fileName);
             Files.write(filePath, avatar.getBytes());
             user.setImage(fileName);
             userRepository.save(user);

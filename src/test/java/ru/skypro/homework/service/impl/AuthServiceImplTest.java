@@ -10,9 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.dto.Role;
+import ru.skypro.homework.service.impl.AuthServiceImpl;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static ru.skypro.homework.dto.Role.USER;
 
 class AuthServiceImplTest {
@@ -33,41 +35,42 @@ class AuthServiceImplTest {
 
     @Test
     void loginSuccess() {
-        String username = "testUser";
+        String email = "testUser@gmail.com";
         String password = "password";
         UserDetails userDetails = User
-                .withUsername(username)
+                .withUsername(email)
                 .password("encodedPassword")
                 .roles("USER")
                 .build();
 
-        when(manager.userExists(username)).thenReturn(true);
-        when(manager.loadUserByUsername(username)).thenReturn(userDetails);
+        when(manager.userExists(email)).thenReturn(true);
+        when(manager.loadUserByUsername(email)).thenReturn(userDetails);
         when(encoder.matches(password, userDetails.getPassword())).thenReturn(true);
 
-        boolean result = authServiceImpl.login(username, password);
+        boolean result = authServiceImpl.login(email, password);
 
         assertTrue(result);
-        verify(manager).loadUserByUsername(username);
+        verify(manager).loadUserByUsername(email);
     }
 
     @Test
     void loginFailureUserNotFound() {
-        String username = "nonexistent";
+        String email = "nonexistent@gmail.com";
 
-        when(manager.userExists(username)).thenReturn(false);
+        when(manager.userExists(email)).thenReturn(false);
 
-        boolean result = authServiceImpl.login(username, "password");
+        boolean result = authServiceImpl.login(email, "password");
 
         assertFalse(result);
     }
 
     @Test
     void registerSuccess() {
-        Register register = new Register("newUser", "password", "Ivan", "Ivanov", "79999999999", USER);
+        // Конструктор: new Register(firstName, lastName, email, password, role)
+        Register register = new Register("Ivan", "Ivanov", "newUser@gmail.com", "password", USER);
 
-        when(manager.userExists(register.getUsername())).thenReturn(false);
-        when(encoder.encode(register.getPassword())).thenReturn("password");
+        when(manager.userExists(register.getEmail())).thenReturn(false);
+        when(encoder.encode(register.getPassword())).thenReturn("encodedPassword");
 
         boolean result = authServiceImpl.register(register);
 
@@ -76,10 +79,10 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void registerFailureZUserAlreadyExists() {
-        Register register = new Register("newUser", "password", "Ivan", "Ivanov", "79999999999", USER);
+    void registerFailureUserAlreadyExists() {
+        Register register = new Register("Ivan", "Ivanov", "newUser@gmail.com", "password", USER);
 
-        when(manager.userExists(register.getUsername())).thenReturn(true);
+        when(manager.userExists(register.getEmail())).thenReturn(true);
 
         boolean result = authServiceImpl.register(register);
 
