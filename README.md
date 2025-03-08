@@ -22,7 +22,7 @@
 
 ### 1. Регистрация пользователя
 
-**http://localhost:8080/register**: `POST`
+**"http://localhost:8080/register"**: `POST`
 
 **Тело запроса**:
 
@@ -37,7 +37,7 @@
 
 ### 2. Вход в учётную запись пользователя
 
-**http://localhost:8080/login**: `POST`
+**"http://localhost:8080/login"**: `POST`
 
 **Тело запроса**:
 
