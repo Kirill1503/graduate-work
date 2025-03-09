@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +56,7 @@ public class AdsController {
             @ApiResponse(responseCode = "201", description = "Объявление успешно создано"),
             @ApiResponse(responseCode = "401", description = "Пользователь не авторизован")
     })
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "multipart/form-data")
     public AdDTO createAd(
             @RequestPart("properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,

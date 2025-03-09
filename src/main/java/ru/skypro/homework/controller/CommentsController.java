@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentDTO;
@@ -20,6 +21,7 @@ public class CommentsController {
         return commentService.getComments(adId);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("{adId}/comments")
     public CommentDTO addComment(@PathVariable Long adId,
                                  @RequestBody CreateOrUpdateCommentDTO dto) {

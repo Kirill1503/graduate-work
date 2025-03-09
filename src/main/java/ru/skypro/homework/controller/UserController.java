@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.GetUserDTO;
+import ru.skypro.homework.dto.NewPasswordDTO;
 import ru.skypro.homework.dto.UpdateUserDTO;
 import ru.skypro.homework.service.UserService;
 
@@ -18,11 +19,11 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/set_password")
-    public void updateUserPassword(@RequestParam("oldPassword") String oldPassword,
-                                   @RequestParam("newPassword") String newPassword) {
-        userService.updateUserPassword(oldPassword, newPassword);
+    @PostMapping("/set_password")
+    public void updateUserPassword(@RequestBody NewPasswordDTO newPasswordDTO) {
+        userService.updateUserPassword(newPasswordDTO.getCurrentPassword(), newPasswordDTO.getNewPassword());
     }
+
 
     @GetMapping("/me")
     public GetUserDTO getUserInformation() {

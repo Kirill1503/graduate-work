@@ -9,7 +9,7 @@ CREATE TABLE ads
     price INTEGER,
     description VARCHAR(400),
     image TEXT,
-    author_id   BIGSERIAL NOT NULL,
+    author_id   BIGINT NOT NULL,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE
 );
 

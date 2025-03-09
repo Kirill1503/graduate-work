@@ -76,6 +76,19 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-maven-plugin</artifactId>
+        <version>4.9.1</version>
+        <configuration>
+          <changeLogFile>src/main/resources/liquibase/changelog-master.yml</changeLogFile>
+          <url>jdbc:postgresql://localhost:5432/ADS</url>
+          <username>Anton</username>
+          <password>12345</password>
+          <driver>org.postgresql.Driver</driver>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 </project>

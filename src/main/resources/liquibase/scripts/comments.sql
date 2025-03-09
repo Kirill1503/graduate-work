@@ -5,7 +5,7 @@
 CREATE TABLE comments
 (
     id         BIGSERIAL PRIMARY KEY,
-    author_id  BIGSERIAL     NOT NULL,
+    author_id  BIGINT    NOT NULL,
     ad_id      BIGSERIAL     NOT NULL,
     text       VARCHAR(1000) NOT NULL,
     created_at TIMESTAMP     NOT NULL,
