@@ -17,4 +17,5 @@ public class AdDTOForGetAll {
 
     @Schema(description = "Список объявлений")
     private List<AdDTO> results;
+
 }

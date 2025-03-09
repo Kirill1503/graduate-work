@@ -1,12 +1,10 @@
 package ru.skypro.homework.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "DTO для создания или обновления объявления")
 public class CreateOrUpdateAdDTO {
@@ -22,4 +20,12 @@ public class CreateOrUpdateAdDTO {
 
     @Schema(description = "Автор объявления (заполняется автоматически на основе аутентификации)", hidden = true)
     private String author;
+
+    // Явно добавляем конструктор со всеми полями:
+    public CreateOrUpdateAdDTO(String title, int price, String description, String author) {
+        this.title = title;
+        this.price = price;
+        this.description = description;
+        this.author = author;
+    }
 }
