@@ -1,0 +1,45 @@
+package ru.skypro.homework.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.dto.CommentDTO;
+import ru.skypro.homework.dto.CommentResponseDTO;
+import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.service.CommentService;
+
+@RestController
+@RequestMapping("/ads")
+@RequiredArgsConstructor
+public class CommentsController {
+
+    private final CommentService commentService;
+
+    @GetMapping("{adId}/comments")
+    public CommentResponseDTO getComments(@PathVariable Long adId) {
+        return commentService.getComments(adId);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("{adId}/comments")
+    public CommentDTO addComment(@PathVariable Long adId,
+                                 @RequestBody CreateOrUpdateCommentDTO dto) {
+        return commentService.addComment(adId, dto);
+    }
+
+    @DeleteMapping("{adId}/comments/{commentId}")
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
+    public void deleteComment(@PathVariable Long adId,
+                              @PathVariable Long commentId) {
+        commentService.deleteComment(adId, commentId);
+    }
+
+    @PatchMapping("{adId}/comments/{commentId}")
+    @PreAuthorize("commentRepository.findById(#commentId).get().author.username == authentication.name")
+    public CommentDTO updateComment(@PathVariable Long adId,
+                                    @PathVariable Long commentId,
+                                    @RequestBody CreateOrUpdateCommentDTO dto) {
+        return commentService.updateComment(adId, commentId, dto);
+    }
+}

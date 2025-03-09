@@ -4,17 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.skypro.homework.dto.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "DTO для регистрации нового пользователя")
-public class Register {
+@Schema(description = "DTO для обновления профиля пользователя")
+public class UpdateUserDTO {
 
     @NotBlank
     @Schema(description = "Имя пользователя", example = "Иван")
@@ -25,14 +23,9 @@ public class Register {
     private String lastName;
 
     @Email
-    @NotBlank
-    @Schema(description = "Email пользователя", example = "user@gmail.com")
+    @Schema(description = "Email пользователя (не может быть изменен)", example = "user@gmail.com")
     private String email;
 
-    @Size(min = 6, max = 30)
-    @Schema(description = "Пароль пользователя", example = "securepassword123")
-    private String password;
-
-    @Schema(description = "Роль пользователя", example = "USER")
-    private Role role;
+    @Schema(description = "Телефон пользователя", example = "+7 (999) 123-45-67")
+    private String phone;
 }
